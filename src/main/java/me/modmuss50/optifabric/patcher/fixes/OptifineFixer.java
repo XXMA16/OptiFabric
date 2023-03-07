@@ -43,6 +43,9 @@ public class OptifineFixer {
 		//net/minecraft/client/render/model/json/ModelOverrideList
 		registerFix("class_806", new ModelOverrideListFix());
 
+		//net/minecraft/client/render/item/HeldItemRenderer
+		registerFix("class_759", new HeldItemRendererFix());
+
 		if (FabricLoader.getInstance().isModLoaded("fabric-rendering-fluids-v1")) {
 			//net/minecraft/client/render/block/FluidRenderer
 			registerFix("class_775", new FluidRendererFix());

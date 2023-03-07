@@ -6,8 +6,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import com.google.common.base.MoreObjects;
-
 import org.apache.commons.lang3.tuple.Pair;
 
 import org.objectweb.asm.ClassWriter;
@@ -25,8 +23,6 @@ import org.spongepowered.asm.mixin.transformer.Config;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.util.version.SemanticVersionImpl;
-import net.fabricmc.loader.util.version.SemanticVersionPredicateParser;
 
 import me.modmuss50.optifabric.mod.OptifineVersion.JarType;
 import me.modmuss50.optifabric.patcher.ClassCache;
@@ -127,7 +123,7 @@ public class OptifabricSetup implements Runnable {
 			}
 		}
 
-		if (isPresent("fabric-rendering-v1", ">=1.5.0") && particlesPresent.getAsBoolean()) {
+		if ((isPresent("fabric-rendering-v1", ">=1.5.0") || isPresent("quilted_fabric_rendering_v1")) && particlesPresent.getAsBoolean()) {
 			if (isPresent("minecraft", ">=1.19.3")) {
 				Mixins.addConfiguration("optifabric.compat.fabric-rendering.new-mixins.json");
 			} else {
@@ -174,7 +170,7 @@ public class OptifabricSetup implements Runnable {
 
 					for (MethodNode method : node.methods) {
 						if ("renderBatched".equals(method.name) && method.desc.endsWith(desc)) {
-							Mixins.addConfiguration("optifabric.compat.indigo.newer-mixins.json");							
+							Mixins.addConfiguration("optifabric.compat.indigo.newer-mixins.json");
 							return;
 						}
 					}
@@ -182,7 +178,7 @@ public class OptifabricSetup implements Runnable {
 					Mixins.addConfiguration("optifabric.compat.indigo.new-mixins.json");
 				});
 			} else {
-				if (isPresent("fabric-renderer-indigo", ">=0.5.0")) {//First released in 0.51.0+1.18.2
+				if (isPresent("fabric-renderer-indigo", ">=0.5.0") || isPresent("quilted_fabric_renderer_indigo")) {//First released in 0.51.0+1.18.2
 					Mixins.addConfiguration("optifabric.compat.indigo.mixins.json");
 				} else {
 					Mixins.addConfiguration("optifabric.compat.indigo.old-mixins.json");
@@ -207,7 +203,13 @@ public class OptifabricSetup implements Runnable {
 		}
 
 		if (isPresent("fabric-screen-api-v1")) {
-			if (isPresent("minecraft", ">=1.19.3")) {
+			if (isPresent("quilt_screen")) {
+				if (isPresent("minecraft", ">=1.19.3")) {
+					Mixins.addConfiguration("optifabric.compat.qslscreenext.mixins.json");
+				} else {
+					Mixins.addConfiguration("optifabric.compat.qslscreenext.old-mixins.json");
+				}
+			} else if (isPresent("minecraft", ">=1.19.3")) {
 				Mixins.addConfiguration("optifabric.compat.fabric-screen-api.newerer-mixins.json");
 			} else if (isPresent("minecraft", ">=1.17-alpha.21.10.a")) {
 				if (farPlanePresent.getAsBoolean()) {
@@ -223,7 +225,7 @@ public class OptifabricSetup implements Runnable {
 
 		if (isPresent("fabric-lifecycle-events-v1", ">=1.4.6") && isPresent("minecraft", "1.17.x")) {
 			Mixins.addConfiguration("optifabric.compat.fabric-lifecycle-events.mixins.json");
-		} else if (isPresent("fabric-lifecycle-events-v1", ">=2.0.8")) {
+		} else if (isPresent("fabric-lifecycle-events-v1", ">=2.0.8") || isPresent("quilted_fabric_lifecycle_events_v1")) {
 			Mixins.addConfiguration("optifabric.compat.fabric-lifecycle-events.new-mixins.json");
 		}
 
@@ -232,7 +234,7 @@ public class OptifabricSetup implements Runnable {
 			Mixins.addConfiguration("optifabric.optifine.old-mixins.json");
 		}
 
-        if (isPresent("fabricloader", ">=0.13.0") && (isPresent("cloth-client-events-v0", ">=3.1.58") || isPresent("cloth-client-events-v0", ">=2.1.60 <3.0") || isPresent("cloth-client-events-v0", ">=1.6.59 <2.0"))) {
+		if (isPresent("fabricloader", ">=0.13.0") && (isPresent("cloth-client-events-v0", ">=3.1.58") || isPresent("cloth-client-events-v0", ">=2.1.60 <3.0") || isPresent("cloth-client-events-v0", ">=1.6.59 <2.0"))) {
 			// no mixins are needed -- cloth had a workaround for https://github.com/FabricMC/Mixin/issues/80
 			// but it is now fixed in fabricloader
 		} else if (isPresent("cloth-client-events-v0", ">=2.0")) {
@@ -261,8 +263,8 @@ public class OptifabricSetup implements Runnable {
 			Mixins.addConfiguration("optifabric.compat.now-playing.mixins.json");
 		}
 
-		if (isPresent("origins", mod -> compareVersions(Pattern.compile("^1\\.16(\\.\\d)?-").matcher(mod.getVersion().getFriendlyString()).find() ? ">=1.16-0.2.0" : ">=0.4.1 <1.0", mod))) {
-			if (isPresent("origins", mod -> !Pattern.compile("^1\\.16(\\.\\d)?-").matcher(mod.getVersion().getFriendlyString()).find() || compareVersions(">=1.16.3-0.4.0", mod))) {
+		if (isPresent("origins", mod -> Loader.compareVersions(Pattern.compile("^1\\.16(\\.\\d)?-").matcher(mod.getVersion().getFriendlyString()).find() ? ">=1.16-0.2.0" : ">=0.4.1 <1.0", mod))) {
+			if (isPresent("origins", mod -> !Pattern.compile("^1\\.16(\\.\\d)?-").matcher(mod.getVersion().getFriendlyString()).find() || Loader.compareVersions(">=1.16.3-0.4.0", mod))) {
 				Mixins.addConfiguration("optifabric.compat.origins.mixins.json");
 			}
 
@@ -374,7 +376,7 @@ public class OptifabricSetup implements Runnable {
 						}
 					}
 				});
-			}	
+			}
 		} else if (isPresent("charm", ">=3.0 <4.0")) {
 			Mixins.addConfiguration("optifabric.compat.charm.mixins.json");
 		} else if (isPresent("charm", ">=4.0")) {
@@ -528,7 +530,7 @@ public class OptifabricSetup implements Runnable {
 	}
 
 	static boolean isPresent(String modID, String versionRange) {
-		return isPresent(modID, modMetadata -> compareVersions(versionRange, modMetadata));
+		return isPresent(modID, modMetadata -> Loader.compareVersions(versionRange, modMetadata));
 	}
 
 	private static boolean isPresent(String modID, Predicate<ModMetadata> extraChecks) {
@@ -540,17 +542,5 @@ public class OptifabricSetup implements Runnable {
 		);
 
 		return extraChecks.test(modMetadata);
-	}
-
-	private static boolean compareVersions(String versionRange, ModMetadata mod) {
-		try {
-			Predicate<SemanticVersionImpl> predicate = SemanticVersionPredicateParser.create(versionRange);
-			SemanticVersionImpl version = new SemanticVersionImpl(mod.getVersion().getFriendlyString(), false);
-			return predicate.test(version);
-		} catch (@SuppressWarnings("deprecation") net.fabricmc.loader.util.version.VersionParsingException e) {
-			System.err.println("Error comparing the version for ".concat(MoreObjects.firstNonNull(mod.getName(), mod.getId())));
-			e.printStackTrace();
-			return false; //Let's just gamble on the version not being valid also not being a problem
-		}
 	}
 }
