@@ -1,5 +1,6 @@
 package me.modmuss50.optifabric.patcher.fixes;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MoreCollectors;
 
 import org.apache.commons.lang3.Validate;
@@ -14,13 +15,25 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import me.modmuss50.optifabric.util.RemappingUtils;
 
+import java.util.List;
+
 public class KeyboardFix implements ClassFixer {
 	//net/minecraft/client/Keyboard.onKey(JIIII)V
 	private final String onKeyName = RemappingUtils.getMethodName("class_309", "method_1466", "(JIIII)V");
+	private final String screenClass = RemappingUtils.getClassName("class_437");
+	private final List<String> onKeyLambdasNames = ImmutableList.of(
+			RemappingUtils.getMethodName("class_309", "method_1458", "(L" + screenClass + ";II)V"),
+			RemappingUtils.getMethodName("class_309", "method_1473", "(L" + screenClass + ";CI)V"));
 
 	@Override
 	public void fix(ClassNode optifine, ClassNode minecraft) {
 		Validate.notNull(onKeyName, "onKeyName null");
+
+		//Needed for JEI, might as well remove the useless forge checks optifine does
+		optifine.methods.removeIf(methodNode -> onKeyLambdasNames.contains(methodNode.name));
+		minecraft.methods.stream()
+				.filter(methodNode -> onKeyLambdasNames.contains(methodNode.name))
+				.forEach(methodNode -> optifine.methods.add(methodNode));
 
 		//Remove the old "broken" method
 		optifine.methods.removeIf(methodNode -> methodNode.name.equals(onKeyName));
