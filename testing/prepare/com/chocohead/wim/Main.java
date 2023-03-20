@@ -100,6 +100,7 @@ public class Main {
 			System.exit(-1);
 			return;
 		}
+		Logger.info("Setting up with '{}'", args[0]);
 		Settings settings = GSON.fromJson(args[0], Settings.class);
 		JkPathTree runDir = JkPathTree.of(args[1]);
 
