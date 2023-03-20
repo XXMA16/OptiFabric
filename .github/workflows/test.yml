@@ -76,11 +76,11 @@ jobs:
         uses: ./repo/.github/actions/run-test
         with:
           config: >-
-            '{
+            {
               "version": "1.19.2",
               "optifine": "HD_U_I1",
               "jars": []
-            }'
+            }
         continue-on-error: true
   test-1_19_3:
     name: Test 1.19.3
@@ -115,17 +115,17 @@ jobs:
           config: >-
             {
               "version": "1.19.3",
-              '"optifine": "HD_U_I2_pre5",'
+              "optifine": "HD_U_I2_pre5",
               "jars": []
             }
         continue-on-error: true
       - name: Test OptiFabric with Fabric API
         uses: ./repo/.github/actions/run-test
         with:
-          config: |-
+          config: >-
             {
               "version": "1.19.3",
               "optifine": "HD_U_I2_pre5",
-              "jars": ["net.fabricmc.fabric-api:fabric-api:0.75.1+1.19.3"]
+              "jars": [\"net.fabricmc.fabric-api:fabric-api:0.75.1+1.19.3\"]
             }
         continue-on-error: true
