@@ -22,5 +22,6 @@ runs:
         -Dfabric.dli.main=net.fabricmc.loader.launch.knot.KnotClient
         -Dfabric.skipMcProvider=true
         -Dfabric.debug.logLibClassification=true
+        -Dfabric.systemLibraries=launcher.jar
         -jar launcher.jar
       shell: bash
