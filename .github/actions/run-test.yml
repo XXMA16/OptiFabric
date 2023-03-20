@@ -1,0 +1,29 @@
+name: 'Run Test'
+description: 'Test if all mixins will apply for the given configuration'
+inputs:
+  config:
+    description: 'The configuration to test'
+    required: true
+  run-location:
+    description: 'Where to run the test'
+    default: ${{ github.workspace }}
+  provider:
+    description: 'The game provider to use'
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Download configuration parts
+      run: java -jar will-it-mix.jar setup "${{ inputs.config }}" "${{ inputs.run-location }}" "${{ inputs.provider }}"
+      shell: bash
+    - name: Run test
+      run: >-
+        java
+        -ea
+        -Dfabric.dli.config="${{ inputs.run-location }}/launch.cfg"
+        -Dfabric.dli.env=client
+        -Dfabric.dli.main=net.fabricmc.loader.launch.knot.KnotClient
+        -Dfabric.skipMcProvider=true
+        -Dfabric.debug.logLibClassification=true
+        -jar launcher.jar
+      shell: bash
