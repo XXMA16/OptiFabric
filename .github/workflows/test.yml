@@ -20,8 +20,11 @@ jobs:
           java-version: 8
       - name: Clone
         uses: actions/checkout@v3
+      - name: Ensure jekaw is executable
+        run: chmod +x jekaw
+        working-directory: testing/
       - name: Build setup and game provider jars
-        run: 'jekaw Build#pack'
+        run: './jekaw Build#pack'
         working-directory: testing/
       - name: Download OptiFabric jars
         uses: actions/download-artifact@v3
