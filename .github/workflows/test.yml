@@ -35,16 +35,15 @@ jobs:
         run: ls -R
         working-directory: built/
       - name: Filter for the OptiFabric mod jar
-        run: ls -Q | grep -xv optifabric-[[:digit:]]+\.[[:digit:]]+\.jar | xargs rm
+        run: ls -Q | egrep -xv \"optifabric-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\.jar\" | xargs rm
         working-directory: built/
+      - name: Combine testing jars for upload
+        run: mv testing/jeka/output/will-it-mix.jar testing/jeka/output/will-it-mix-provider.jar built/
       - name: Upload testing jars
         uses: actions/upload-artifact@v3
         with:
           name: Setup
-          path: |
-            built/optifabric-*.*.jar
-            testing/jeka/output/will-it-mix.jar
-            testing/jeka/output/will-it-mix-provider.jar
+          path: built/
   test-1_19_2:
     name: Test 1.19.2
     runs-on: ubuntu-latest
@@ -63,7 +62,7 @@ jobs:
         run: java -jar will-it-mix.jar prepare 1.19.2 ${{ github.workspace }}
       - name: Get OptiFabric mod jar location
         id: mod
-        run: echo "version=$(grep -x optifabric-[[:digit:]]+\.[[:digit:]]+\.jar)" >> $GITHUB_OUTPUT
+        run: echo "version=$(find -regextype egrep -regex \./optifabric-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\.jar)" >> $GITHUB_OUTPUT
       - name: Check OptiFabric mod jar location
         run: echo "The OptiFabric jar is at ${{ steps.mod.outputs.version }}"
       - name: Write launch config file
@@ -101,7 +100,7 @@ jobs:
         run: java -jar will-it-mix.jar prepare 1.19.3 ${{ github.workspace }}
       - name: Get OptiFabric mod jar location
         id: mod
-        run: echo "version=$(grep -x optifabric-[[:digit:]]+\.[[:digit:]]+\.jar)" >> $GITHUB_OUTPUT
+        run: echo "version=$(find -regextype egrep -regex \./optifabric-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\.jar)" >> $GITHUB_OUTPUT
       - name: Check OptiFabric mod jar location
         run: echo "The OptiFabric jar is at ${{ steps.mod.outputs.version }}"
       - name: Write launch config file
