@@ -14,6 +14,7 @@ import com.google.gson.JsonSyntaxException;
 
 import dev.jeka.core.api.depmanagement.JkDependencySet;
 import dev.jeka.core.api.depmanagement.JkModuleDependency;
+import dev.jeka.core.api.depmanagement.JkRepo;
 import dev.jeka.core.api.depmanagement.JkRepoSet;
 import dev.jeka.core.api.depmanagement.resolution.JkDependencyResolver;
 import dev.jeka.core.api.depmanagement.resolution.JkResolveResult;
@@ -47,7 +48,7 @@ public class Fabric {
 
 		Logger.debug("Resolving Fabric Loader libraries");
 		List<JkModuleDependency> libraries = profile.libraries.stream().map(library -> JkModuleDependency.of(library.name)).collect(Collectors.toList());
-		JkResolveResult result = JkDependencyResolver.of().setRepos(JkRepoSet.of("https://maven.fabricmc.net/")).resolve(JkDependencySet.of(libraries));
+		JkResolveResult result = JkDependencyResolver.of().setRepos(JkRepoSet.of("https://maven.fabricmc.net/", JkRepo.MAVEN_CENTRAL_URL)).resolve(JkDependencySet.of(libraries));
 		if (result.getErrorReport().hasErrors()) {
 			Logger.error(result.getErrorReport().toString());
 			throw new RuntimeException("Unable to download all Fabric Loader " + version + " libraries");

@@ -80,6 +80,6 @@ public class Minecraft {
 			}
 		}
 
-		return JkDependencyResolver.of().setRepos(JkRepoSet.of(JkRepo.ofMavenCentral(), JkRepo.of("https://libraries.minecraft.net"))).resolve(JkDependencySet.of(dependencies));
+		return JkDependencyResolver.of().setRepos(JkRepoSet.of(JkRepo.MAVEN_CENTRAL_URL, "https://libraries.minecraft.net")).resolve(JkDependencySet.of(dependencies));
 	}
 }
