@@ -24,7 +24,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: Optifabric-Artifact
-        path: built/
+          path: built/
       - name: Check downloaded file structure
         run: ls -R
         working-directory: built/s
