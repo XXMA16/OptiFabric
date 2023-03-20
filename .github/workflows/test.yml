@@ -62,8 +62,12 @@ jobs:
         run: echo "The OptiFabric jar is at ${{ steps.mod.outputs.version }}"
       - name: Write launch config file
         run: echo "commonProperties\n\tfabric.addMods=${{ github.workspace }}/${{ steps.mod.outputs.version }}\n" > launch.cfg
+      - name: Clone
+        uses: actions/checkout@v3
+        with:
+          path: repo
       - name: Test OptiFabric alone
-        uses: ./.github/actions/run-test
+        uses: ./repo/.github/actions/run-test
         with:
           config: >-
             {
@@ -96,8 +100,12 @@ jobs:
         run: echo "The OptiFabric jar is at ${{ steps.mod.outputs.version }}"
       - name: Write launch config file
         run: echo "commonProperties\n\tfabric.addMods=${{ github.workspace }}/${{ steps.mod.outputs.version }}\n" > launch.cfg
+      - name: Clone
+        uses: actions/checkout@v3
+        with:
+          path: repo
       - name: Test OptiFabric alone
-        uses: ./.github/actions/run-test
+        uses: ./repo/.github/actions/run-test
         with:
           config: >-
             {
@@ -108,7 +116,7 @@ jobs:
           provider: ${{ github.workspace }}/will-it-mix-provider.jar
         continue-on-error: true
       - name: Test OptiFabric with Fabric API
-        uses: ./.github/actions/run-test
+        uses: ./repo/.github/actions/run-test
         with:
           config: >-
             {
