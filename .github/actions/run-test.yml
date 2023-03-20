@@ -7,14 +7,11 @@ inputs:
   run-location:
     description: 'Where to run the test'
     default: ${{ github.workspace }}
-  provider:
-    description: 'The game provider to use'
-    required: true
 runs:
   using: composite
   steps:
     - name: Download configuration parts
-      run: java -jar will-it-mix.jar setup "${{ inputs.config }}" "${{ inputs.run-location }}" "${{ inputs.provider }}"
+      run: java -jar will-it-mix.jar setup "${{ inputs.config }}" "${{ inputs.run-location }}"
       shell: bash
     - name: Run test
       run: >-

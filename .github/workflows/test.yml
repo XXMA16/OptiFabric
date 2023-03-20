@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: Build OptiFabric jar to test
     uses: ./.github/workflows/main.yml
   prepare:
     name: Test Preparation
@@ -59,7 +60,7 @@ jobs:
         with:
           name: Setup
       - name: Prepare for testing
-        run: java -jar will-it-mix.jar prepare 1.19.2 ${{ github.workspace }}
+        run: java -jar will-it-mix.jar prepare 1.19.2 ${{ github.workspace }} will-it-mix-provider.jar
       - name: Get OptiFabric mod jar location
         id: mod
         run: echo "version=$(find -regextype egrep -regex \./optifabric-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\.jar)" >> $GITHUB_OUTPUT
@@ -80,7 +81,6 @@ jobs:
               "optifine": "HD_U_I1",
               "jars": []
             }
-          provider: ${{ github.workspace }}/will-it-mix-provider.jar
         continue-on-error: true
   test-1_19_3:
     name: Test 1.19.3
@@ -97,7 +97,7 @@ jobs:
         with:
           name: Setup
       - name: Prepare for testing
-        run: java -jar will-it-mix.jar prepare 1.19.3 ${{ github.workspace }}
+        run: java -jar will-it-mix.jar prepare 1.19.3 ${{ github.workspace }} will-it-mix-provider.jar
       - name: Get OptiFabric mod jar location
         id: mod
         run: echo "version=$(find -regextype egrep -regex \./optifabric-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\.jar)" >> $GITHUB_OUTPUT
@@ -118,7 +118,6 @@ jobs:
               "optifine": "HD_U_I2_pre5",
               "jars": []
             }
-          provider: ${{ github.workspace }}/will-it-mix-provider.jar
         continue-on-error: true
       - name: Test OptiFabric with Fabric API
         uses: ./repo/.github/actions/run-test
@@ -129,5 +128,4 @@ jobs:
               "optifine": "HD_U_I2_pre5",
               "jars": ["net.fabricmc.fabric-api:fabric-api:0.75.1+1.19.3"]
             }
-          provider: ${{ github.workspace }}/will-it-mix-provider.jarr
         continue-on-error: true
