@@ -67,7 +67,7 @@ jobs:
       - name: Check OptiFabric mod jar location
         run: echo "The OptiFabric jar is at ${{ steps.mod.outputs.version }}"
       - name: Write launch config file
-        run: echo "commonProperties\n\tfabric.addMods=${{ github.workspace }}/${{ steps.mod.outputs.version }}\n" > launch.cfg
+        run: echo -e "commonProperties\n\tfabric.addMods=${{ github.workspace }}/${{ steps.mod.outputs.version }}\n" > launch.cfg
       - name: Clone
         uses: actions/checkout@v3
         with:
@@ -76,11 +76,11 @@ jobs:
         uses: ./repo/.github/actions/run-test
         with:
           config: >-
-            {
+            '{
               "version": "1.19.2",
               "optifine": "HD_U_I1",
               "jars": []
-            }
+            }'
         continue-on-error: true
   test-1_19_3:
     name: Test 1.19.3
@@ -104,7 +104,7 @@ jobs:
       - name: Check OptiFabric mod jar location
         run: echo "The OptiFabric jar is at ${{ steps.mod.outputs.version }}"
       - name: Write launch config file
-        run: echo "commonProperties\n\tfabric.addMods=${{ github.workspace }}/${{ steps.mod.outputs.version }}\n" > launch.cfg
+        run: echo -e "commonProperties\n\tfabric.addMods=${{ github.workspace }}/${{ steps.mod.outputs.version }}\n" > launch.cfg
       - name: Clone
         uses: actions/checkout@v3
         with:
@@ -115,14 +115,14 @@ jobs:
           config: >-
             {
               "version": "1.19.3",
-              "optifine": "HD_U_I2_pre5",
+              '"optifine": "HD_U_I2_pre5",'
               "jars": []
             }
         continue-on-error: true
       - name: Test OptiFabric with Fabric API
         uses: ./repo/.github/actions/run-test
         with:
-          config: >-
+          config: |-
             {
               "version": "1.19.3",
               "optifine": "HD_U_I2_pre5",
