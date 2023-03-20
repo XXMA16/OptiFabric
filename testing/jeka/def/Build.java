@@ -42,6 +42,7 @@ class Build extends JkBean implements JkSupplier {
                     .and("net.fabricmc:tiny-mappings-parser:0.3.0+build.17")
             		.and("net.fabricmc:tiny-remapper:0.8.2")
     				.and("net.fabricmc:access-widener:2.1.0")*/
+                    .and("org.apache.commons:commons-lang3:3.12.0") //Already a Minecraft dependency so doesn't hurt
             ).applyOnProject(project -> project.getConstruction().apply(construction -> {
             	construction.getDependencyResolver().addRepos(JkRepo.of("https://maven.fabricmc.net"));
             	construction.getCompilation().getLayout().setSourceSimpleStyle(Concern.PROD);

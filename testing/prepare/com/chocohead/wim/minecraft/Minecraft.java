@@ -11,13 +11,9 @@ import org.tinylog.Logger;
 
 import com.google.gson.JsonSyntaxException;
 
-import dev.jeka.core.api.depmanagement.JkDependency;
-import dev.jeka.core.api.depmanagement.JkDependencySet;
 import dev.jeka.core.api.depmanagement.JkModuleDependency;
 import dev.jeka.core.api.depmanagement.JkRepo;
 import dev.jeka.core.api.depmanagement.JkRepoSet;
-import dev.jeka.core.api.depmanagement.resolution.JkDependencyResolver;
-import dev.jeka.core.api.depmanagement.resolution.JkResolveResult;
 import dev.jeka.core.api.file.JkUrlFileProxy;
 import dev.jeka.core.api.utils.JkUtilsString;
 
@@ -38,19 +34,14 @@ public class Minecraft {
 		Path game = JkUrlFileProxy.of(Objects.requireNonNull(json.downloads.get("client"), "No client download?").url, MinecraftVersions.CACHE.resolve(version + ".jar")).get();
 
 		Logger.debug("Resolving libraries");
-		JkResolveResult libaries = resolveLibaries(json);
-		if (libaries.getErrorReport().hasErrors()) {
-			Logger.error(libaries.getErrorReport().toString());
-			throw new RuntimeException("Unable to download all " + version + " libraries");
-		}
-
-		List<Path> out = new ArrayList<>(libaries.getFiles().getEntries());
-		out.add(0, game);
-		return out;
+		List<Path> libaries = resolveLibaries(json);
+		libaries.add(0, game);
+		return libaries;
 	}
 
-	private static JkResolveResult resolveLibaries(MinecraftVersion json) {
-		List<JkDependency> dependencies = new ArrayList<>();
+	private static List<Path> resolveLibaries(MinecraftVersion json) {
+		List<Path> libraries = new ArrayList<>();
+		JkRepoSet repo = JkRepoSet.of("https://libraries.minecraft.net", JkRepo.MAVEN_CENTRAL_URL);
 
 		for (Library library : json.libraries) {
 			if (!library.shouldUse()) continue;
@@ -72,7 +63,7 @@ public class Minecraft {
 			}
 
 			if (library.downloads.artifact != null) {//Some libraries (like LWJGL-Platform) only have native artifacts
-				dependencies.add(dependency);
+				libraries.add(repo.get(dependency));
 			}
 
 			if (library.hasNative()) {//Shouldn't need these unless the game is actually started 
@@ -80,6 +71,6 @@ public class Minecraft {
 			}
 		}
 
-		return JkDependencyResolver.of().setRepos(JkRepoSet.of(JkRepo.MAVEN_CENTRAL_URL, "https://libraries.minecraft.net")).resolve(JkDependencySet.of(dependencies));
+		return libraries;
 	}
 }
