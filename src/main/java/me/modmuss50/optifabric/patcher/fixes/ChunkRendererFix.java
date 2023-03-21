@@ -1,5 +1,6 @@
 package me.modmuss50.optifabric.patcher.fixes;
 
+import java.util.Arrays;
 import java.util.ListIterator;
 
 import org.objectweb.asm.Opcodes;
@@ -41,7 +42,8 @@ public class ChunkRendererFix implements ClassFixer {
 							if (trailingBoolean) end--;
 							boolean trailingRenderLayer = RemappingUtils.getClassName("class_1921").equals(args[end].getInternalName());
 							if (trailingRenderLayer) end--;
-							assert "net/minecraftforge/client/model/data/IModelData".equals(args[end].getInternalName());
+							assert "net/minecraftforge/client/model/data/IModelData".equals(args[end].getInternalName()) || "net/minecraftforge/client/model/data/ModelData".equals(args[end].getInternalName()):
+								"Expected Forge (I)ModelData, found: '" + args[end] + "' from " + Arrays.toString(args);
 							end--;
 							assert end > 0 && Type.BOOLEAN == args[end - 1].getSort();
 							boolean nativeRandom = "java/util/Random".equals(args[end].getInternalName());

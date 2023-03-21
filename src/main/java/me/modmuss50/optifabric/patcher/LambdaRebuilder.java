@@ -286,7 +286,8 @@ public class LambdaRebuilder implements IMappingProvider, Closeable {
 
 			if (lostMethod == null) {
 				if (gainedMethod == null) {
-					assert Objects.equals(lost.getFullName(), gained.getFullName());
+					assert Objects.equals(lost.getFullName(), gained.getFullName()) || commonMethods.stream().anyMatch(method -> gained.name.equals(method.node.name) && gained.desc.equals(method.node.desc)):
+						"Expected lost lambda '" + lost.getFullName() + "' to equal gained lambda '" + gained.getFullName() + '\'';
 					continue;
 				} else {
 					throw new IllegalStateException("Couldn't find original method for lambda: " + lost.getFullName());
