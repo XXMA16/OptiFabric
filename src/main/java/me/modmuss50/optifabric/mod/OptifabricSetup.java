@@ -177,7 +177,7 @@ public class OptifabricSetup implements Runnable {
 
 					for (MethodNode method : node.methods) {
 						if ("renderBatched".equals(method.name) && method.desc.endsWith(desc)) {
-							Mixins.addConfiguration("optifabric.compat.indigo.newer-mixins.json");							
+							Mixins.addConfiguration("optifabric.compat.indigo.newer-mixins.json");
 							return;
 						}
 					}
@@ -235,7 +235,7 @@ public class OptifabricSetup implements Runnable {
 			Mixins.addConfiguration("optifabric.optifine.old-mixins.json");
 		}
 
-        if (isPresent("fabricloader", ">=0.13.0") && (isPresent("cloth-client-events-v0", ">=3.1.58") || isPresent("cloth-client-events-v0", ">=2.1.60 <3.0") || isPresent("cloth-client-events-v0", ">=1.6.59 <2.0"))) {
+		if (isPresent("fabricloader", ">=0.13.0") && (isPresent("cloth-client-events-v0", ">=3.1.58") || isPresent("cloth-client-events-v0", ">=2.1.60 <3.0") || isPresent("cloth-client-events-v0", ">=1.6.59 <2.0"))) {
 			// no mixins are needed -- cloth had a workaround for https://github.com/FabricMC/Mixin/issues/80
 			// but it is now fixed in fabricloader
 		} else if (isPresent("cloth-client-events-v0", ">=2.0")) {
@@ -377,7 +377,7 @@ public class OptifabricSetup implements Runnable {
 						}
 					}
 				});
-			}	
+			}
 		} else if (isPresent("charm", ">=3.0 <4.0")) {
 			Mixins.addConfiguration("optifabric.compat.charm.mixins.json");
 		} else if (isPresent("charm", ">=4.0")) {
@@ -510,7 +510,9 @@ public class OptifabricSetup implements Runnable {
 			Mixins.addConfiguration("optifabric.compat.zoomify.mixins.json");
 		}
 
-		if (isPresent("borderlessmining", ">=1.1.3")) {
+		if (isPresent("borderlessmining", ">=1.1.6")) {
+			Mixins.addConfiguration("optifabric.compat.borderlessmining.new-mixins.json");
+		} else if (isPresent("borderlessmining", ">=1.1.3")) {
 			Mixins.addConfiguration("optifabric.compat.borderlessmining.mixins.json");
 		}
 
