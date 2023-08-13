@@ -63,7 +63,7 @@ public class OptifabricSetup implements Runnable {
 				return injector.predictFuture(RemappingUtils.getClassName("class_702")).filter(node -> {//ParticleManager
 					//(MatrixStack, VertexConsumerProvider$Immediate, LightmapTextureManager, Camera, Frustum)
 					String desc = RemappingUtils.mapMethodDescriptor("(Lnet/minecraft/class_4587;Lnet/minecraft/class_4597$class_4598;"
-																	+ "Lnet/minecraft/class_765;Lnet/minecraft/class_4184;FLnet/minecraft/class_4604;)V");
+							+ "Lnet/minecraft/class_765;Lnet/minecraft/class_4184;FLnet/minecraft/class_4604;)V");
 
 					for (MethodNode method : node.methods) {
 						if (("renderParticles".equals(method.name) || "render".equals(method.name)) && desc.equals(method.desc)) {
@@ -128,6 +128,11 @@ public class OptifabricSetup implements Runnable {
 				Mixins.addConfiguration("optifabric.compat.fabric-rendering.new-mixins.json");
 			} else {
 				Mixins.addConfiguration("optifabric.compat.fabric-rendering.mixins.json");
+			}
+		}
+		if (isPresent("fabric-rendering-v1", ">=1.13.0 <2.0") || isPresent("fabric-rendering-v1", ">=2.1.0")) {
+			if (!Loader.isQuilt()) {
+				Mixins.addConfiguration("optifabric.compat.fabric-rendering.extra-mixins.json");
 			}
 		}
 
@@ -209,6 +214,10 @@ public class OptifabricSetup implements Runnable {
 				} else {
 					Mixins.addConfiguration("optifabric.compat.qslscreenext.old-mixins.json");
 				}
+			} else if (isPresent("minecraft", ">=1.20")) {
+				Mixins.addConfiguration("optifabric.compat.fabric-screen-api.new4er-mixins.json");
+			} else if (isPresent("fabric-api", ">=0.81.0")) {
+				Mixins.addConfiguration("optifabric.compat.fabric-screen-api.new3er-mixins.json");
 			} else if (isPresent("minecraft", ">=1.19.3")) {
 				Mixins.addConfiguration("optifabric.compat.fabric-screen-api.newerer-mixins.json");
 			} else if (isPresent("minecraft", ">=1.17-alpha.21.10.a")) {
@@ -255,7 +264,7 @@ public class OptifabricSetup implements Runnable {
 			Mixins.addConfiguration("optifabric.compat.trumpet-skeleton.mixins.json");
 		}
 
-		if (isPresent("multiconnect", ">1.3.14")) {
+		if (isPresent("multiconnect", ">1.3.14 <1.6-beta.1")) {
 			Mixins.addConfiguration("optifabric.compat.multiconnect.mixins.json");
 		}
 
@@ -399,7 +408,11 @@ public class OptifabricSetup implements Runnable {
 			Mixins.addConfiguration("optifabric.compat.images.mixins.json");
 		}
 
-		if (isPresent("architectury", ">=3.7")) {
+		if (isPresent("architectury", ">=9.0.6")) {
+			Mixins.addConfiguration("optifabric.compat.architectury-AB.new4er-mixins.json");
+		} else if (isPresent("architectury", ">=7.0.52")) {
+			Mixins.addConfiguration("optifabric.compat.architectury-AB.newererer-mixins.json");
+		} else if (isPresent("architectury", ">=3.7")) {
 			Mixins.addConfiguration("optifabric.compat.architectury-AB.newerer-mixins.json");
 		} else if (isPresent("architectury", ">=2.0")) {
 			assert isPresent("minecraft", ">=1.17-beta.1");
@@ -507,7 +520,9 @@ public class OptifabricSetup implements Runnable {
 			Mixins.addConfiguration("optifabric.compat.zoomify.mixins.json");
 		}
 
-		if (isPresent("borderlessmining", ">=1.1.3")) {
+		if (isPresent("borderlessmining", ">=1.1.6")) {
+			Mixins.addConfiguration("optifabric.compat.borderlessmining.new-mixins.json");
+		} else if (isPresent("borderlessmining", ">=1.1.3")) {
 			Mixins.addConfiguration("optifabric.compat.borderlessmining.mixins.json");
 		}
 

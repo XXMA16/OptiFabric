@@ -1,8 +1,13 @@
 package me.modmuss50.optifabric.patcher.fixes;
 
-import com.google.common.collect.MoreCollectors;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableSet;
 
 import org.apache.commons.lang3.Validate;
+
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -15,27 +20,32 @@ import org.objectweb.asm.tree.VarInsnNode;
 import me.modmuss50.optifabric.util.RemappingUtils;
 
 public class KeyboardFix implements ClassFixer {
-	//net/minecraft/client/Keyboard.onKey(JIIII)V
-	private final String onKeyName = RemappingUtils.getMethodName("class_309", "method_1466", "(JIIII)V");
+	private final String screenClass = RemappingUtils.getClassName("class_437");
+	private final Set<String> revertMethods = ImmutableSet.of(
+			RemappingUtils.getMethodName("class_309", "method_1466", "(JIIII)V"), //Keyboard, onKey
+			RemappingUtils.getMethodName("class_309", "method_1454", "(IL" + screenClass + ";[ZIII)V"),
+			RemappingUtils.getMethodName("class_309", "method_1458", "(L" + screenClass + ";II)V"),
+			RemappingUtils.getMethodName("class_309", "method_1473", "(L" + screenClass + ";CI)V"),
+			RemappingUtils.getMethodName("class_309", "method_1463", "(Lnet/minecraft/class_2561)V"),
+			RemappingUtils.getMethodName("class_309", "method_1464", "(Lnet/minecraft/class_2561)V")
+	);
 
 	@Override
 	public void fix(ClassNode optifine, ClassNode minecraft) {
-		Validate.notNull(onKeyName, "onKeyName null");
+		Validate.noNullElements(revertMethods, "Failed to remap Keyboard method name %d"); //ImmutableSet iteration order is stable
 
-		//Remove the old "broken" method
-		optifine.methods.removeIf(methodNode -> methodNode.name.equals(onKeyName));
+		//Remove the "broken" OptiFine methods
+		optifine.methods.removeIf(method -> revertMethods.contains(method.name));
 
-		//Find the vanilla method
-		MethodNode methodNode = minecraft.methods.stream().filter(node -> node.name.equals(onKeyName)).collect(MoreCollectors.onlyElement());
-		Validate.notNull(methodNode, "old method null");
-		
-		//Find the lambda inside the vanilla method (not matched as Optifine changes its descriptor)
-		MethodNode lambdaNode = minecraft.methods.stream().filter(node -> "method_1454".equals(node.name)).collect(MoreCollectors.onlyElement());
-		Validate.notNull(lambdaNode, "old method lambda null");
+		//Find the vanilla methods to revert back to
+		List<MethodNode> lambdas = minecraft.methods.stream().filter(method -> revertMethods.contains(method.name)).collect(Collectors.toList());
+		if (lambdas.size() != revertMethods.size()) {
+			Set<String> foundLambdas = lambdas.stream().map(method -> method.name).collect(Collectors.toSet());
+			throw new RuntimeException(revertMethods.stream().filter(name -> !foundLambdas.contains(name)).collect(Collectors.joining(", ", "Failed to find Keyboard methods: ", "")));
+		}
 
 		//Add the vanilla methods back in
-		optifine.methods.add(methodNode);
-		optifine.methods.add(lambdaNode);
+		optifine.methods.addAll(lambdas);
 
 		//lambda$chatTyped(Screen,int,int)void
 		String targetDescC = RemappingUtils.mapMethodDescriptor("(Lnet/minecraft/class_437;CI)V"); // method_1473
@@ -49,7 +59,7 @@ public class KeyboardFix implements ClassFixer {
 					}
 				}
 			} else {
-				for (AbstractInsnNode ain : method.instructions.toArray()) {
+				for (AbstractInsnNode ain : method.instructions) {
 					if (ain.getOpcode() == Opcodes.INVOKEDYNAMIC) {
 						InvokeDynamicInsnNode idin = (InvokeDynamicInsnNode) ain;
 						if (idin.bsmArgs.length == 3 && idin.bsmArgs[1] instanceof Handle) {

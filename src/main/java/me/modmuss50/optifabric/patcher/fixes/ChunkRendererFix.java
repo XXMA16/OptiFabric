@@ -41,6 +41,8 @@ public class ChunkRendererFix implements ClassFixer {
 							if (trailingBoolean) end--;
 							boolean trailingRenderLayer = RemappingUtils.getClassName("class_1921").equals(args[end].getInternalName());
 							if (trailingRenderLayer) end--;
+							assert "net/minecraftforge/client/model/data/IModelData".equals(args[end].getInternalName());
+							end--;
 							assert end > 0 && Type.BOOLEAN == args[end - 1].getSort();
 							boolean nativeRandom = "java/util/Random".equals(args[end].getInternalName());
 							String desc = "(Lnet/minecraft/class_2680;"
