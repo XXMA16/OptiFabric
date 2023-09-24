@@ -5,17 +5,20 @@ buildscript {
 			url = 'https://maven.fabricmc.net/'
 		}
 		mavenCentral()
-		maven { 
+		gradlePluginPortal()
+		maven {
 			name = "Jitpack"
 			url 'https://jitpack.io/'
 		}
 	}
 	dependencies {
 		classpath 'com.github.Chocohead.Fabric-Loom:fabric-loom:0d0261a'
+		classpath 'com.github.johnrengelman:shadow:7.1.2'
 	}
 }
 
 apply plugin: net.fabricmc.loom.LoomGradlePlugin
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'maven-publish'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -40,7 +43,11 @@ dependencies {
 	modImplementation "com.github.Chocohead:Fabric-ASM:${project.fabric_asm_version}"
 	include "com.github.Chocohead:Fabric-ASM:${project.fabric_asm_version}"
 
-	include(modImplementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.2.0-rc.2")))
+	shadow(annotationProcessor("io.github.llamalad7:mixinextras-common:${project.mixinextras_version}"))
+}
+
+configurations {
+	implementation.extendsFrom shadow
 }
 
 sourceSets {
@@ -116,6 +123,17 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 jar {
 	from "LICENSE"
+}
+
+shadowJar {
+	configurations = [project.configurations.shadow]
+	relocate("com.llamalad7.mixinextras", "me.modmuss50.optifabric.mixinextras")
+	mergeServiceFiles()
+}
+
+remapJar {
+	dependsOn(shadowJar)
+	input.set(shadowJar.archiveFile)
 }
 
 publishing {

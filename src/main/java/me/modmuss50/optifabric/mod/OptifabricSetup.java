@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.MoreObjects;
 
+import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import org.apache.commons.lang3.tuple.Pair;
 
 import org.objectweb.asm.ClassWriter;
@@ -41,6 +42,8 @@ public class OptifabricSetup implements Runnable {
 	//This is called early on to allow us to get the transformers in beofore minecraft starts
 	@Override
 	public void run() {
+		MixinExtrasBootstrap.init();
+
 		OptifineInjector injector;
 		try {
 			Pair<File, ClassCache> runtime = OptifineSetup.getRuntime();
